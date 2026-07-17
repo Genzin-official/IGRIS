@@ -1,0 +1,6 @@
+{
+  "name": "IGRIS AI",
+  "description": "An elegant AI assistant named IGRIS, similar to Claude and Gemini, featuring model selection, search grounding, prompt libraries, code execution simulation, and modern streaming chat.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
