@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { ChatMessage, GroundingMetadata } from '../types';
+import { ChatMessage, GroundingMetadata, CustomPersona } from '../types';
 import { parseMarkdown, formatInlineStyles } from '../utils';
-import { Send, Sparkles, User, Globe, ExternalLink, Copy, Check, Info, AlertTriangle, ArrowDown } from 'lucide-react';
+import { Send, Sparkles, User, Globe, ExternalLink, Copy, Check, Info, AlertTriangle, ArrowDown, HelpCircle, Github } from 'lucide-react';
 import PromptSuggestions from './PromptSuggestions';
 
 interface ChatWindowProps {
@@ -9,6 +9,9 @@ interface ChatWindowProps {
   isGenerating: boolean;
   activeModelId: string;
   onSendMessage: (content: string) => void;
+  activePersona: CustomPersona;
+  isGitHubOpen?: boolean;
+  onToggleGitHub?: () => void;
 }
 
 export default function ChatWindow({
@@ -16,6 +19,9 @@ export default function ChatWindow({
   isGenerating,
   activeModelId,
   onSendMessage,
+  activePersona,
+  isGitHubOpen = false,
+  onToggleGitHub,
 }: ChatWindowProps) {
   const [input, setInput] = useState('');
   const [copiedId, setCopiedId] = useState<string | null>(null);
@@ -193,11 +199,24 @@ export default function ChatWindow({
       {/* Header */}
       <header className="h-14 border-b border-gray-100 flex items-center justify-between px-6 shrink-0 bg-white z-10 select-none">
         <div className="flex items-center gap-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">
-          <span>IGRIS Intellect</span>
+          <span className="text-sm mr-1">{activePersona.emoji}</span>
+          <span className="text-slate-800 font-bold">{activePersona.name}</span>
           <span className="w-1 h-1 rounded-full bg-gray-300"></span>
-          <span className="text-black">{activeModelId === 'gemini-3.5-flash' ? 'Core v3.5' : 'Elite v3.1'}</span>
+          <span className="text-slate-500">{activeModelId === 'gemini-3.5-flash' ? 'Core v3.5' : 'Elite v3.1'}</span>
         </div>
-        <div className="flex items-center gap-4 text-gray-400">
+        <div className="flex items-center gap-3 text-gray-400">
+          <button
+            onClick={onToggleGitHub}
+            className={`flex items-center gap-1.5 py-1 px-3 rounded-full text-xs font-bold border transition-all duration-200 ${
+              isGitHubOpen 
+                ? 'bg-black border-black text-white shadow-sm' 
+                : 'bg-[#FCFAF7] border-[#EADFC9] hover:bg-[#F5EFE4] text-slate-700'
+            }`}
+            title="Toggle GitHub repository integration panel"
+          >
+            <Github className="w-3.5 h-3.5" />
+            <span className="text-[10px] uppercase tracking-wider">GitHub Center</span>
+          </button>
           <div className="flex items-center gap-1 bg-gray-50 border border-gray-100 py-1 px-2.5 rounded-full text-[10px] font-bold text-gray-500">
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
             <span>Active</span>
@@ -215,17 +234,17 @@ export default function ChatWindow({
         {messages.length === 0 ? (
           /* Blank state: Noble Greeting dashboard */
           <div className="flex flex-col items-center justify-center min-h-[70vh] text-center max-w-2xl mx-auto w-full px-4 py-8 select-none" id="welcome-dashboard">
-            <div className="w-16 h-16 bg-black text-white rounded-2xl flex items-center justify-center mb-6 shadow-xl relative overflow-hidden">
-              <div className="w-8 h-8 border-4 border-white rotate-45"></div>
+            <div className="w-16 h-16 bg-[#FCFAF7] border border-[#EADFC9] rounded-2xl flex items-center justify-center mb-6 shadow-md relative overflow-hidden text-3xl">
+              {activePersona.emoji}
             </div>
             <h1 className="text-3xl font-semibold tracking-tight text-[#111111]">
-              What's on your mind?
+              Consulting {activePersona.name}
             </h1>
             <p className="text-sm text-slate-600 mt-2 max-w-md mx-auto leading-relaxed">
-              IGRIS is ready to assist with high-fidelity coding, strategic writing, and complex logic.
+              {activePersona.description || "Ready to assist with high-fidelity coding, strategic writing, and complex logic."}
             </p>
 
-            <PromptSuggestions onSelectPrompt={onSendMessage} />
+            <PromptSuggestions onSelectPrompt={onSendMessage} suggestions={activePersona.promptSuggestions} />
           </div>
         ) : (
           <div className="space-y-6 max-w-3xl mx-auto w-full" id="messages-list-wrapper">
@@ -239,15 +258,15 @@ export default function ChatWindow({
                 >
                   {/* Left Avatar for Assistant */}
                   {isAssistant && (
-                    <div className="w-8 h-8 rounded-lg bg-black text-white flex items-center justify-center shadow-sm shrink-0 font-semibold text-xs select-none">
-                      <div className="w-3 h-3 border border-white rotate-45"></div>
+                    <div className="w-8 h-8 rounded-lg bg-[#FCFAF7] border border-[#EADFC9] flex items-center justify-center shadow-sm shrink-0 font-semibold text-sm select-none">
+                      {activePersona.emoji}
                     </div>
                   )}
 
                   {/* Message Bubble container */}
                   <div className={`max-w-[85%] flex flex-col gap-1.5`}>
                     <div className="flex items-center gap-1.5 px-1 text-[10px] font-bold text-gray-400 uppercase tracking-widest select-none">
-                      <span className={isAssistant ? 'text-[#A38A67]' : 'text-gray-500'}>{isAssistant ? 'IGRIS' : 'Sovereign'}</span>
+                      <span className={isAssistant ? 'text-[#A38A67]' : 'text-gray-500'}>{isAssistant ? activePersona.name : 'Sovereign'}</span>
                       <span>•</span>
                       <span>{new Date(message.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
                       {isAssistant && message.modelUsed && (
@@ -294,12 +313,12 @@ export default function ChatWindow({
             {/* Simulated active streaming loading indicator */}
             {isGenerating && (
               <div className="flex gap-4 justify-start animate-fade-in" id="streaming-indicator">
-                <div className="w-8 h-8 rounded-lg bg-black text-white flex items-center justify-center shrink-0">
-                  <div className="w-2.5 h-2.5 border border-white rotate-45 animate-spin"></div>
+                <div className="w-8 h-8 rounded-lg bg-[#FCFAF7] border border-[#EADFC9] flex items-center justify-center shrink-0 text-sm select-none animate-pulse">
+                  {activePersona.emoji}
                 </div>
                 <div className="max-w-[85%] flex flex-col gap-1.5">
                   <div className="flex items-center gap-2 px-1 text-[10px] font-bold text-gray-400 uppercase tracking-widest select-none">
-                    <span className="text-[#A38A67] font-extrabold">IGRIS</span>
+                    <span className="text-[#A38A67] font-extrabold">{activePersona.name}</span>
                     <span>•</span>
                     <span className="text-[#C5A880] animate-pulse">Drafting...</span>
                   </div>

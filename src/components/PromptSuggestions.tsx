@@ -1,49 +1,61 @@
 import React from 'react';
-import { Code, Lightbulb, GraduationCap, Compass, ArrowUpRight } from 'lucide-react';
+import { Code, Lightbulb, GraduationCap, Compass, ArrowUpRight, MessageSquare } from 'lucide-react';
 
 interface PromptSuggestionsProps {
   onSelectPrompt: (prompt: string) => void;
+  suggestions?: string[];
 }
 
-export default function PromptSuggestions({ onSelectPrompt }: PromptSuggestionsProps) {
-  const suggestions = [
-    {
-      title: 'Analyze & Optimize Code',
-      desc: 'Review a React/TypeScript component for performance and clean patterns.',
-      icon: Code,
-      prompt: 'Review this TypeScript code and suggest architectural enhancements, focusing on safety, type completeness, and standard React 18+ conventions.',
-      color: 'text-violet-600 dark:text-violet-400',
-      bgColor: 'bg-violet-50 dark:bg-violet-950/30',
-    },
-    {
-      title: 'Brainstorm App Ideas',
-      desc: 'Formulate highly innovative product mechanics and features for a modern web application.',
-      icon: Lightbulb,
-      prompt: 'I want to build a highly creative and original SaaS application. Help me brainstorm 3 core concepts with distinct feature layouts and design aesthetics.',
-      color: 'text-amber-600 dark:text-amber-400',
-      bgColor: 'bg-amber-50 dark:bg-amber-950/30',
-    },
-    {
-      title: 'Explain Complex Science',
-      desc: 'Translate complex mathematical or physics topics into elegant conceptual models.',
-      icon: GraduationCap,
-      prompt: 'Explain Quantum Superposition and Entanglement using elegant physical analogies suitable for a curious student.',
-      color: 'text-emerald-600 dark:text-emerald-400',
-      bgColor: 'bg-emerald-50 dark:bg-emerald-950/30',
-    },
-    {
-      title: 'Refine Strategic Writing',
-      desc: 'Draft structured content with a highly articulate, persuasive, and stately tone.',
-      icon: Compass,
-      prompt: 'Help me draft an elegant pitch letter to a group of seed investors for a sustainable deep-tech startup. Ensure the language is highly refined and professional.',
-      color: 'text-sky-600 dark:text-sky-400',
-      bgColor: 'bg-sky-50 dark:bg-sky-950/30',
-    },
-  ];
+export default function PromptSuggestions({ onSelectPrompt, suggestions }: PromptSuggestionsProps) {
+  // If custom suggestions are provided, format them dynamically
+  const displaySuggestions = suggestions && suggestions.length > 0
+    ? suggestions.map((text, idx) => ({
+        title: text,
+        desc: "Tap to ask this persona immediately.",
+        icon: MessageSquare,
+        prompt: text,
+        color: 'text-indigo-600 dark:text-indigo-400',
+        bgColor: 'bg-indigo-50 dark:bg-indigo-950/30',
+      }))
+    : [
+        {
+          title: 'Analyze & Optimize Code',
+          desc: 'Review a React/TypeScript component for performance and clean patterns.',
+          icon: Code,
+          prompt: 'Review this TypeScript code and suggest architectural enhancements, focusing on safety, type completeness, and standard React 18+ conventions.',
+          color: 'text-violet-600 dark:text-violet-400',
+          bgColor: 'bg-violet-50 dark:bg-violet-950/30',
+        },
+        {
+          title: 'Brainstorm App Ideas',
+          desc: 'Formulate highly innovative product mechanics and features for a modern web application.',
+          icon: Lightbulb,
+          prompt: 'I want to build a highly creative and original SaaS application. Help me brainstorm 3 core concepts with distinct feature layouts and design aesthetics.',
+          color: 'text-amber-600 dark:text-amber-400',
+          bgColor: 'bg-amber-50 dark:bg-amber-950/30',
+        },
+        {
+          title: 'Explain Complex Science',
+          desc: 'Translate complex mathematical or physics topics into elegant conceptual models.',
+          icon: GraduationCap,
+          prompt: 'Explain Quantum Superposition and Entanglement using elegant physical analogies suitable for a curious student.',
+          color: 'text-emerald-600 dark:text-emerald-400',
+          bgColor: 'bg-emerald-50 dark:bg-emerald-950/30',
+        },
+        {
+          title: 'Refine Strategic Writing',
+          desc: 'Draft structured content with a highly articulate, persuasive, and stately tone.',
+          icon: Compass,
+          prompt: 'Help me draft an elegant pitch letter to a group of seed investors for a sustainable deep-tech startup. Ensure the language is highly refined and professional.',
+          color: 'text-sky-600 dark:text-sky-400',
+          bgColor: 'bg-sky-50 dark:bg-sky-950/30',
+        },
+      ];
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-2xl mx-auto w-full mt-10 px-4" id="prompt-suggestions-container">
-      {suggestions.map((item, index) => {
+      {displaySuggestions.map((item, index) => {
+        const IconComponent = item.icon;
         return (
           <button
             key={index}
@@ -52,9 +64,14 @@ export default function PromptSuggestions({ onSelectPrompt }: PromptSuggestionsP
             className="group flex flex-col justify-between p-4 border border-gray-100 rounded-2xl hover:border-black/10 hover:bg-gray-50 bg-white text-left transition-all duration-200 relative overflow-hidden focus:outline-none focus:ring-1 focus:ring-black/20"
           >
             <div className="space-y-1">
-              <h3 className="text-sm font-semibold text-slate-900 group-hover:text-black transition-colors">
-                {item.title}
-              </h3>
+              <div className="flex items-center gap-2 mb-1.5">
+                <div className={`p-1 rounded-md ${item.bgColor}`}>
+                  <IconComponent className={`w-3.5 h-3.5 ${item.color}`} />
+                </div>
+                <h3 className="text-sm font-semibold text-slate-900 group-hover:text-black transition-colors">
+                  {item.title}
+                </h3>
+              </div>
               <p className="text-xs text-slate-600 line-clamp-2 leading-relaxed">
                 {item.desc}
               </p>

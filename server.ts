@@ -52,7 +52,7 @@ async function startServer() {
   // Chat API route (with SSE Streaming)
   app.post("/api/chat", async (req, res) => {
     try {
-      const { messages, model, enableSearch } = req.body;
+      const { messages, model, enableSearch, systemInstruction, temperature } = req.body;
 
       if (!messages || !Array.isArray(messages)) {
         return res.status(400).json({ error: "Messages array is required." });
@@ -92,13 +92,19 @@ async function startServer() {
         tools.push({ googleSearch: {} });
       }
 
+      const config: any = {
+        systemInstruction: systemInstruction || DEFAULT_SYSTEM_INSTRUCTION,
+        tools: tools.length > 0 ? tools : undefined,
+      };
+
+      if (typeof temperature === 'number') {
+        config.temperature = temperature;
+      }
+
       const responseStream = await client.models.generateContentStream({
         model: selectedModel,
         contents,
-        config: {
-          systemInstruction: DEFAULT_SYSTEM_INSTRUCTION,
-          tools: tools.length > 0 ? tools : undefined,
-        }
+        config,
       });
 
       for await (const chunk of responseStream) {
