@@ -52,10 +52,10 @@ export default function PromptSuggestions({ onSelectPrompt }: PromptSuggestionsP
             className="group flex flex-col justify-between p-4 border border-gray-100 rounded-2xl hover:border-black/10 hover:bg-gray-50 bg-white text-left transition-all duration-200 relative overflow-hidden focus:outline-none focus:ring-1 focus:ring-black/20"
           >
             <div className="space-y-1">
-              <h3 className="text-sm font-medium text-slate-800 group-hover:text-black transition-colors">
+              <h3 className="text-sm font-semibold text-slate-900 group-hover:text-black transition-colors">
                 {item.title}
               </h3>
-              <p className="text-xs text-gray-400 line-clamp-2 leading-relaxed">
+              <p className="text-xs text-slate-600 line-clamp-2 leading-relaxed">
                 {item.desc}
               </p>
             </div>

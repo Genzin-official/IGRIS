@@ -59,7 +59,19 @@ async function startServer() {
       }
 
       const client = getGeminiClient();
-      const selectedModel = model || "gemini-3.5-flash";
+      let selectedModel = model || "gemini-3.5-flash";
+
+      // Map deprecated models to active models to prevent 404 errors
+      if (
+        selectedModel.includes("2.5-flash") || 
+        selectedModel.includes("1.5-flash") || 
+        selectedModel.includes("2.0-flash-exp") ||
+        selectedModel === "gemini-1.5-pro"
+      ) {
+        selectedModel = "gemini-3.5-flash";
+      } else if (selectedModel.includes("2.5-pro")) {
+        selectedModel = "gemini-3.1-pro-preview";
+      }
 
       // Map messages to Gemini contents structure
       // Roles are mapped: user -> user, assistant -> model

@@ -27,8 +27,11 @@ export default function App() {
       }
 
       const savedModel = localStorage.getItem(LOCAL_STORAGE_MODEL_KEY);
-      if (savedModel) {
+      if (savedModel && AVAILABLE_MODELS.some((m) => m.id === savedModel)) {
         setSelectedModelId(savedModel);
+      } else {
+        setSelectedModelId('gemini-3.5-flash');
+        localStorage.setItem(LOCAL_STORAGE_MODEL_KEY, 'gemini-3.5-flash');
       }
 
       const savedSearch = localStorage.getItem(LOCAL_STORAGE_SEARCH_KEY);
